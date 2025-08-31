@@ -5,11 +5,17 @@ pipeline {
       args '--user root -v /var/run/docker.sock:/var/run/docker.sock'
     }
   }
+
   stages {
 
     stage('Checkout') {
       steps {
-        git branch: 'main', url: 'https://github.com/PUNEETH-KUMAR-M/Jenkins-Zero-To-Hero.git'
+        // Use Jenkins built-in Git plugin for stability
+        checkout([
+          $class: 'GitSCM',
+          branches: [[name: '*/main']],
+          userRemoteConfigs: [[url: 'https://github.com/PUNEETH-KUMAR-M/Jenkins-Zero-To-Hero.git']]
+        ])
       }
     }
 
@@ -61,11 +67,11 @@ pipeline {
             git config user.email "kpuneeth664@gmail.com"
             git config user.name "PUNEETH-KUMAR-M"
 
-            # Make sure we’re on latest main
+            # Ensure we are on latest main
             git checkout main || git checkout -b main
             git pull origin main
 
-            # Update deployment.yml with current build number
+            # Replace image tag with current build number
             sed -i "s/replaceImageTag/$BUILD_NUMBER/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
 
             # Commit & push
@@ -76,6 +82,5 @@ pipeline {
         }
       }
     }
-
   }
 }
