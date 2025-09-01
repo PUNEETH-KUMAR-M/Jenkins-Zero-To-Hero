@@ -51,8 +51,9 @@ pipeline {
                             git config user.email "kpuneeth664@gmail.com"
                             git config user.name "PUNEETH-KUMAR-M"
 
-                            # checkout branch (not detached HEAD)
+                            
                             git checkout main || git checkout -b main
+                            git pull origin main --no-rebase
 
                             sed -i "s/replaceImageTag/${BUILD_NUMBER}/g" java-maven-sonar-argocd-helm-k8s/spring-boot-app-manifests/deployment.yml
 
